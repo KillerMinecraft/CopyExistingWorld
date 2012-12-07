@@ -17,30 +17,66 @@ public class CopyExistingWorld extends com.ftwinston.Killer.WorldOption
 	@Override
 	public Option[] setupOptions()
 	{
-		Option[] options = {
-			new Option("No custom worlds specified", true)
-		};
+		int num = Plugin.getNumOptions();
+		if ( num < 1 )
+		{
+			Option[] options = {
+				new Option("No custom worlds defined", true)
+			};
+			
+			return options;
+		}
+		else
+		{
+			Option[] options = new Option[num];
+			
+			for ( int i=0; i<num; i++ )
+				options[i] = new Option(Plugin.getOptionName(i), i==0);
+			
+			return options;
+		}
+	}
+	
+	@Override
+	public void toggleOption(int num)
+	{
+		super.toggleOption(num);
 		
-		return options;
+		int[] allOptions = new int[Plugin.getNumOptions()];
+		for ( int i=0; i<allOptions.length; i++ )
+			allOptions[i] = i;
+		
+		Option.ensureOnlyOneEnabled(getOptions(), num, allOptions);
 	}
 	
 	@Override
 	public void setupWorld(final WorldConfig world, final Runnable runWhenDone)
 	{
-		if ( world.getEnvironment() != Environment.NORMAL )
-		{
-			createWorld(world, runWhenDone);
-			return;
-		}
+		int numOptions = Plugin.getNumOptions();
+		String optionName = null;
+		for ( int i=0; i<numOptions; i++ )
+			if ( getOption(i).isEnabled() )
+			{
+				optionName = Plugin.getOptionName(i);
+				world.setSeed(Plugin.getOptionSeed(i));
+				break;
+			}
 		
-		final String name = world.getName();
+		if ( world.getEnvironment() == Environment.NETHER )
+			optionName += "_nether";
+		else if ( world.getEnvironment() == Environment.THE_END )
+			optionName += "_the_end";
+		
+		final String targetName = world.getName();
+		final String sourceWorldName = optionName;
+		
 		getPlugin().getServer().getScheduler().scheduleAsyncDelayedTask(getPlugin(), new Runnable() {
 			
 			@Override
 			public void run()
 			{
-				File sourceDir = new File(getPlugin().getServer().getWorldContainer() + File.separator + name);
-				File targetDir = new File(getPlugin().getServer().getWorldContainer() + File.separator + name);
+				File sourceDir = new File(getPlugin().getServer().getWorldContainer() + File.separator + sourceWorldName);
+				File targetDir = new File(getPlugin().getServer().getWorldContainer() + File.separator + targetName);
 				
 				try
 				{
@@ -48,23 +84,9 @@ public class CopyExistingWorld extends com.ftwinston.Killer.WorldOption
 				}
 				catch (IOException ex)
 				{
-					//getPlugin().log.warning("An error occurred copying the " + name + " world");
 				}
 				
-				sourceDir = new File(getPlugin().getServer().getWorldContainer() + File.separator + name + "_nether");
-				targetDir = new File(getPlugin().getServer().getWorldContainer() + File.separator + name + "_nether");
-				
-				if ( sourceDir.exists() && sourceDir.isDirectory() )
-					try
-					{
-						copyFolder(sourceDir, targetDir);
-					}
-					catch (IOException ex)
-					{
-						//getPlugin().log.warning("An error occurred copying the " + name + "_nether world");
-					}
-				
-				// now run a synchronous delayed task, to actually load/create worlds for these folders
+				// now run a synchronous delayed task, to actually load/create the world for this folder
 				getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
 					@Override
 					public void run()
@@ -78,6 +100,9 @@ public class CopyExistingWorld extends com.ftwinston.Killer.WorldOption
 	
 	private void copyFolder(File source, File dest) throws IOException
 	{
+		if ( !source.exists() )
+			return;
+		
 		if(source.isDirectory())
 		{	 
     		//if directory doesn't exist, create it
