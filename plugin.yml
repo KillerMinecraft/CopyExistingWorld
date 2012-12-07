@@ -1,4 +1,4 @@
-name: Copy Existing World
+name: Existing World
 main: com.ftwinston.Killer.CopyExistingWorld.Plugin
 depend: [Killer]
 version: 1

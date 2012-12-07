@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.bukkit.configuration.ConfigurationSection;
+
 import com.ftwinston.Killer.Killer;
 import com.ftwinston.Killer.WorldConfig;
 import com.ftwinston.Killer.WorldOption;
@@ -27,7 +29,8 @@ public class Plugin extends WorldOptionPlugin
 	
 	private void loadOptions()
 	{
-		Map<String, Object> optionMap = getConfig().getConfigurationSection("worlds").getValues(false);
+		ConfigurationSection section = getConfig().getConfigurationSection("worlds");
+		Map<String, Object> optionMap = section == null ? null : section.getValues(false);
 		
 		// if we don't have anything specified, add some defaults
 		if ( optionMap == null || optionMap.size() == 0 )
@@ -44,7 +47,6 @@ public class Plugin extends WorldOptionPlugin
 			optionMap.put("Village and cliffs", "-2056320673894174252");
 			optionMap.put("Pyramid and temple", "-2866479247629964952");
 			optionMap.put("Peninsula", "The Election");
-			optionMap.put("Dungeon spawn", "1736813803934715730");
 			optionMap.put("Nearby mushroom biome", "5596653170798224322");
 			
 			getConfig().createSection("worlds", optionMap);
