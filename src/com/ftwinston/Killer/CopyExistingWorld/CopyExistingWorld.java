@@ -70,7 +70,7 @@ public class CopyExistingWorld extends com.ftwinston.Killer.WorldOption
 		final String targetName = world.getName();
 		final String sourceWorldName = optionName;
 		
-		getPlugin().getServer().getScheduler().scheduleAsyncDelayedTask(getPlugin(), new Runnable() {
+		getPlugin().getServer().getScheduler().runTaskAsynchronously(getPlugin(), new Runnable() {
 			
 			@Override
 			public void run()
