@@ -1,7 +1,7 @@
 name: Existing World
-main: com.ftwinston.Killer.CopyExistingWorld.Plugin
-depend: [Killer]
+main: com.ftwinston.KillerMinecraft.Modules.CopyExistingWorld.Plugin
+depend: [Killer Minecraft]
 version: 1
 load: STARTUP
-description: A world option for Killer Minecraft
+description: A world generator for Killer Minecraft
 author: FTWinston

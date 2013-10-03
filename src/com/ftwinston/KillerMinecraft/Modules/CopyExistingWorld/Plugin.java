@@ -1,26 +1,33 @@
-package com.ftwinston.Killer.CopyExistingWorld;
+package com.ftwinston.KillerMinecraft.Modules.CopyExistingWorld;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.ftwinston.Killer.Killer;
-import com.ftwinston.Killer.WorldConfig;
-import com.ftwinston.Killer.WorldOption;
-import com.ftwinston.Killer.WorldOptionPlugin;
+import com.ftwinston.KillerMinecraft.WorldConfig;
+import com.ftwinston.KillerMinecraft.WorldGenerator;
+import com.ftwinston.KillerMinecraft.WorldGeneratorPlugin;
 
-public class Plugin extends WorldOptionPlugin
+public class Plugin extends WorldGeneratorPlugin
 {
+	@Override
+	public String[] getDescriptionText() { return new String[] {"Using an existing world or a fixed seed."}; }
+	
+	@Override
+	public Material getMenuIcon() { return Material.MELON_SEEDS; }
+	
+	@Override
 	public void onEnable()
 	{
 		loadOptions();
-		Killer.registerWorldOption(this);
+		super.onEnable();
 	}
 	
 	@Override
-	public WorldOption createInstance()
+	public WorldGenerator createInstance()
 	{
 		return new CopyExistingWorld();
 	}

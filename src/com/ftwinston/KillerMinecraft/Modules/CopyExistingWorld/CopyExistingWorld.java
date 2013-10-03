@@ -1,4 +1,4 @@
-package com.ftwinston.Killer.CopyExistingWorld;
+package com.ftwinston.KillerMinecraft.Modules.CopyExistingWorld;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,53 +9,40 @@ import java.io.OutputStream;
 
 import org.bukkit.World.Environment;
 
-import com.ftwinston.Killer.Option;
-import com.ftwinston.Killer.WorldConfig;
+import com.ftwinston.KillerMinecraft.Option;
+import com.ftwinston.KillerMinecraft.WorldConfig;
+import com.ftwinston.KillerMinecraft.WorldGenerator;
+import com.ftwinston.KillerMinecraft.Configuration.ToggleOption;
 
-public class CopyExistingWorld extends com.ftwinston.Killer.WorldOption
+public class CopyExistingWorld extends WorldGenerator
 {
+	ToggleOption[] options;
+
 	@Override
 	public Option[] setupOptions()
 	{
 		int num = Plugin.getNumOptions();
 		if ( num < 1 )
-		{
-			Option[] options = {
-				new Option("No custom worlds defined", true)
-			};
-			
-			return options;
-		}
+			options = new ToggleOption[] { new ToggleOption("No custom worlds defined", true) };
 		else
 		{
-			Option[] options = new Option[num];
-			
+			options = new ToggleOption[num];
+
 			for ( int i=0; i<num; i++ )
-				options[i] = new Option(Plugin.getOptionName(i), i==0);
+				options[i] = new ToggleOption(Plugin.getOptionName(i), i==0);
 			
-			return options;
+			ToggleOption.ensureOnlyOneEnabled(options);
 		}
-	}
-	
-	@Override
-	public void toggleOption(int num)
-	{
-		super.toggleOption(num);
 		
-		int[] allOptions = new int[Plugin.getNumOptions()];
-		for ( int i=0; i<allOptions.length; i++ )
-			allOptions[i] = i;
-		
-		Option.ensureOnlyOneEnabled(getOptions(), num, allOptions);
+		return options;
 	}
 	
 	@Override
 	public void setupWorld(final WorldConfig world, final Runnable runWhenDone)
 	{
-		int numOptions = Plugin.getNumOptions();
 		String optionName = null;
-		for ( int i=0; i<numOptions; i++ )
-			if ( getOption(i).isEnabled() )
+		for ( int i=0; i<options.length; i++ )
+			if ( options[i].isEnabled() )
 			{
 				optionName = Plugin.getOptionName(i);
 				world.setSeed(Plugin.getOptionSeed(i));
